@@ -29,14 +29,13 @@ fn filter_files(ignore: &Vec<String>, path: &Path) -> bool {
 }
 
 fn find_todos(dir: DirEntry) -> HashSet<String> {
-    let extensions = vec!["rs", "toml", "yml", "yaml", "js", "ts", "tsx", "html", "php"];
+    let extensions = vec!["rs", "toml", "yml", "yaml", "js", "ts", "tsx", "html", "php", "swift"];
     let path = dir.path();
     let mut unique_todos: HashSet<String> = HashSet::new();
     if path.is_file() && path.extension().is_some() && extensions.contains(&path.extension().unwrap().to_str().unwrap()) {
         let contents = std::fs::read_to_string(path).unwrap();
         let todos: Vec<_> = contents.match_indices("TODO").collect();
         if todos.len() > 0 {
-            // find longest path name and pad with its length
             for (_, todo) in todos.iter().enumerate() {
                 let mut todo_str = String::new();
                 let file_for_todo = format!("{}: ", path.display());
