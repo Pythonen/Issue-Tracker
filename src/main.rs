@@ -16,7 +16,7 @@ async fn main() {
             if todos.len() > 0 {
                 for todo in todos {
                     println!("{}", todo);
-                    println!("----------------------------------------");
+                    println!("\n----------------------------------------\n");
                 }
             } 
         });
@@ -29,7 +29,7 @@ fn filter_files(ignore: &Vec<String>, path: &Path) -> bool {
 }
 
 fn find_todos(dir: DirEntry) -> HashSet<String> {
-    let extensions = vec!["rs", "toml", "yml", "yaml", "js", "ts", "tsx", "html", "php", "swift"];
+    let extensions = vec!["rs", "toml", "yml", "yaml", "js", "ts", "tsx", "html", "php", "swift", "go"];
     let path = dir.path();
     let mut unique_todos: HashSet<String> = HashSet::new();
     if path.is_file() && path.extension().is_some() && extensions.contains(&path.extension().unwrap().to_str().unwrap()) {
