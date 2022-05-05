@@ -1,6 +1,7 @@
 use std::{env::current_dir, path::Path, collections::HashSet};
 use walkdir::{WalkDir, DirEntry};
 mod args;
+mod actions;
 use args::parse_arguments;
 
 #[tokio::main]
@@ -34,7 +35,7 @@ fn filter_files(ignore: &Vec<String>, path: &Path) -> bool {
 fn find_todos(dir: DirEntry) -> HashSet<String> {
     let path = dir.path();
     let mut unique_todos: HashSet<String> = HashSet::new();
-    if path.is_file() && path.extension().is_some() { // !extensions.contains(&path.extension().unwrap().to_str().unwrap()) {
+    if path.is_file() && path.extension().is_some() {
         if let Ok(contents) = std::fs::read_to_string(path) {
             let todos: Vec<_> = contents.match_indices("TODO").collect();
             if todos.len() > 0 {
@@ -78,6 +79,3 @@ fn ignore_files(cur_dir: &std::path::PathBuf) -> Option<Vec<String>> {
     return None;
 }
 
-fn init_new_project() {
-    todo!()
-}
