@@ -1,8 +1,11 @@
 use std::{env::current_dir, path::Path, collections::HashSet};
 use walkdir::{WalkDir, DirEntry};
+mod args;
+use args::parse_arguments;
 
 #[tokio::main]
 async fn main() {
+    parse_arguments();
     // get files from current directory
     let cur_dir = current_dir().unwrap();
     println!("{:_^40}", "TODOS");
@@ -73,4 +76,8 @@ fn ignore_files(cur_dir: &std::path::PathBuf) -> Option<Vec<String>> {
         continue;
     }
     return None;
+}
+
+fn init_new_project() {
+    todo!()
 }
