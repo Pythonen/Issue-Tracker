@@ -20,8 +20,6 @@ jobs:
           - macOS-latest
         toolchain:
           - nightly
-        cargo_flags:
-          - "--all-features"
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
@@ -37,13 +35,13 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --all ${{ matrix.cargo_flags }}
+          # args: --all ${{ matrix.cargo_flags }}
 
       - name: Test
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all ${{ matrix.cargo_flags }}
+          # args: --all ${{ matrix.cargo_flags }}
 
 
   miri:
