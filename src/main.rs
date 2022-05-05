@@ -29,21 +29,21 @@ fn filter_files(ignore: &Vec<String>, path: &Path) -> bool {
 }
 
 fn find_todos(dir: DirEntry) -> HashSet<String> {
-    let extensions = vec!["rs", "toml", "yml", "yaml", "js", "ts", "tsx", "html", "php", "swift", "go"];
     let path = dir.path();
     let mut unique_todos: HashSet<String> = HashSet::new();
-    if path.is_file() && path.extension().is_some() && extensions.contains(&path.extension().unwrap().to_str().unwrap()) {
-        let contents = std::fs::read_to_string(path).unwrap();
-        let todos: Vec<_> = contents.match_indices("TODO").collect();
-        if todos.len() > 0 {
-            for (_, todo) in todos.iter().enumerate() {
-                let mut todo_str = String::new();
-                let file_for_todo = format!("{}: ", path.display());
-                todo_str.push_str(&file_for_todo);
-                for c in contents.chars().skip(todo.0).take_while(|c| c != &'\n') {
-                    todo_str.push(c);
+    if path.is_file() && path.extension().is_some() { // !extensions.contains(&path.extension().unwrap().to_str().unwrap()) {
+        if let Ok(contents) = std::fs::read_to_string(path) {
+            let todos: Vec<_> = contents.match_indices("TODO").collect();
+            if todos.len() > 0 {
+                for (_, todo) in todos.iter().enumerate() {
+                    let mut todo_str = String::new();
+                    let file_for_todo = format!("{}: ", path.display());
+                    todo_str.push_str(&file_for_todo);
+                    for c in contents.chars().skip(todo.0).take_while(|c| c != &'\n') {
+                        todo_str.push(c);
+                    }
+                    unique_todos.insert(todo_str);
                 }
-                unique_todos.insert(todo_str);
             }
         }
     }
