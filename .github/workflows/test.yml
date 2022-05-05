@@ -21,7 +21,6 @@ jobs:
         toolchain:
           - nightly
         cargo_flags:
-          - "--no-default-features"
           - "--all-features"
     steps:
       - name: Checkout source code
