@@ -1,12 +1,12 @@
-use std::path::Path;
+use std::path::{PathBuf, Path};
 
 
 pub fn filter_files(ignore: &Vec<String>, path: &Path) -> bool {
-    let path_str = path.display().to_string();
+    let path_str = path.to_str().unwrap().to_string();
     !ignore.iter().any(|x| path_str.contains(x))
 }
 
-pub fn ignore_files(cur_dir: &std::path::PathBuf) -> Option<Vec<String>> {
+pub fn ignore_files(cur_dir: &PathBuf) -> Option<Vec<String>> {
     for entry in cur_dir.read_dir().unwrap() {
         if let Ok(entry) = entry {
             // if file is gitignore, read its contents
