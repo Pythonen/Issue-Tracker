@@ -1,5 +1,8 @@
 use config::{Config};
-use std::fs;
+use walkdir::{DirEntry, WalkDir};
+use std::{fs, collections::HashSet, env::current_dir};
+
+use crate::util::{ignore_files, filter_files};
 
 pub fn init_new_project() -> Config {
     match Config::builder()

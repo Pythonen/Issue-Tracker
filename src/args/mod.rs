@@ -20,4 +20,10 @@ pub fn parse_arguments() {
     if args.cmds == SubCommand::Init {
         actions::init_new_project();
     }
+    else if args.cmds == SubCommand::Print {
+        actions::print_todos();
+    }
+    else if args.cmds == SubCommand::Report {
+        actions::report_todos();
+    }
 }
