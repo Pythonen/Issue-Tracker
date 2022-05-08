@@ -27,8 +27,11 @@ pub fn init_new_project() -> Config {
             }
 }
 
-fn find_todos_wrapper(fun: fn(String) -> ()) {
+fn find_todos_wrapper(fun: fn(&String) -> ()) -> Vec<String> {
+    // TODO: Could be refactored to be a bit more efficient
+    // as it now returns the todos everytime
     let cur_dir = current_dir().unwrap();
+    let mut opt_todos = vec![];
     if let Some(to_ignore) = ignore_files(&cur_dir) {
         WalkDir::new(".")
         .into_iter()
@@ -38,15 +41,28 @@ fn find_todos_wrapper(fun: fn(String) -> ()) {
             let todos = find_todos(x);
             if todos.len() > 0 {
                 for todo in todos {
-                    fun(todo);
+                    fun(&todo);
+                    opt_todos.push(todo);
                 }
             }
         })
     }
+    return opt_todos;
 }
 
-pub fn report_todos() {
-    todo!()
+pub async fn report_todos() {
+    let client = reqwest::Client::new();
+    let todos = find_todos_wrapper(|_| {});
+    match client
+        // TODO: Read from env by appending the project name
+        // to the URL etc.
+        .post("http://localhost:8080/report")
+        .json(&todos)
+        .send()
+        .await {
+            Ok(_) => println!("Todos reported!"),
+            Err(e) => println!("Something went wrong: {}", e),
+        }
 }
 
 pub fn print_todos() {
