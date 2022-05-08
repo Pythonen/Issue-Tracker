@@ -1,5 +1,7 @@
 use std::path::{PathBuf, Path};
 
+use config::Config;
+
 
 pub fn filter_files(ignore: &Vec<String>, path: &Path) -> bool {
     let path_str = path.to_str().unwrap().to_string();
@@ -29,4 +31,8 @@ pub fn ignore_files(cur_dir: &PathBuf) -> Option<Vec<String>> {
         continue;
     }
     return None;
+}
+
+pub fn get_config_file() -> Config { 
+    return Config::builder().add_source(config::File::with_name(".it.toml")).build().unwrap();
 }
