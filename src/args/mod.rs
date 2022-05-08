@@ -15,28 +15,30 @@ enum SubCommand {
     Init
 }
 
-pub fn parse_arguments(args: CliArgs) -> Result<(), String> {
-    if args.cmds == SubCommand::Init {
-        // TODO: Check that the operation succeeds
-        actions::init_new_project();
-        return Ok(());
+impl CliArgs {
+    pub fn parse_arguments(self) -> Result<(), String> {
+        if self.cmds == SubCommand::Init {
+            // TODO: Check that the operation succeeds
+            actions::init_new_project();
+            return Ok(());
+        }
+        else if self.cmds == SubCommand::Print {
+            // TODO: Check that the operation succeeds
+            actions::print_todos();
+            return Ok(());
+        }
+        else if self.cmds == SubCommand::Report {
+            // TODO: Check that the operation succeeds !! IMPORTANT !!
+            actions::report_todos();
+            return Ok(());
+        }
+        return Err("Unknown command".to_string());
     }
-    else if args.cmds == SubCommand::Print {
-        // TODO: Check that the operation succeeds
-        actions::print_todos();
-        return Ok(());
-    }
-    else if args.cmds == SubCommand::Report {
-        // TODO: Check that the operation succeeds !! IMPORTANT !!
-        actions::report_todos();
-        return Ok(());
-    }
-    return Err("Unknown command".to_string());
 }
+
 
 #[cfg(test)]
 mod tests {
-    use crate::parse_arguments;
 
     use super::{CliArgs, SubCommand};
     #[test]
@@ -44,7 +46,7 @@ mod tests {
         let args = CliArgs{
             cmds: SubCommand::Init
         };
-        let parsed = parse_arguments(args);
+        let parsed = args.parse_arguments();
         assert!(parsed.is_ok());
     }
 
@@ -55,7 +57,7 @@ mod tests {
         let args = CliArgs{
             cmds: SubCommand::Report
         };
-        let parsed = parse_arguments(args);
+        let parsed = args.parse_arguments();
         assert!(parsed.is_err());
     }
 
@@ -64,7 +66,7 @@ mod tests {
         let args = CliArgs{
             cmds: SubCommand::Print
         };
-        let parsed = parse_arguments(args);
+        let parsed = args.parse_arguments();
         assert!(parsed.is_ok());
     }
 }
