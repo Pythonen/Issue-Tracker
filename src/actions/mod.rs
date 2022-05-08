@@ -17,7 +17,7 @@ pub fn init_new_project() -> Config {
                     println!("No config file found, creating a new one...");
                     let comment = "# This is your project specific config file for *it* (issue tracker).\n\
                                   # You can add your own custom settings here in TOML format.\n\
-                                  project = \"\"";
+                                  workspace = \"\"";
                     fs::write(".it.toml", comment).unwrap();
                     // TODO: better error handling
                     let cfg = Config::builder().add_source(config::File::with_name(".it.toml")).build().unwrap();
