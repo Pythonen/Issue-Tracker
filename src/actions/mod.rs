@@ -1,30 +1,33 @@
-use config::{Config};
+use config::Config;
+use std::{collections::HashSet, env::current_dir, fs};
 use walkdir::{DirEntry, WalkDir};
-use std::{fs, collections::HashSet, env::current_dir};
 
-use crate::util::{ignore_files, filter_files};
+use crate::util::{filter_files, ignore_files};
 
 pub fn init_new_project() -> Config {
     match Config::builder()
-            .add_source(config::File::with_name(".it.toml"))
-            .build() 
-            {
-                Ok(cfg) => {
-                    println!("Config file found... using it from now on!");
-                    return cfg;
-                }
-                Err(_) => {
-                    println!("No config file found, creating a new one...");
-                    let comment = "# This is your project specific config file for *it* (issue tracker).\n\
+        .add_source(config::File::with_name(".it.toml"))
+        .build()
+    {
+        Ok(cfg) => {
+            println!("Config file found... using it from now on!");
+            return cfg;
+        }
+        Err(_) => {
+            println!("No config file found, creating a new one...");
+            let comment = "# This is your project specific config file for *it* (issue tracker).\n\
                                   # You can add your own custom settings here in TOML format.\n\
                                   workspace = \"\"";
-                    fs::write(".it.toml", comment).unwrap();
-                    // TODO: better error handling
-                    let cfg = Config::builder().add_source(config::File::with_name(".it.toml")).build().unwrap();
-                    println!("Config file created!");
-                    return cfg;
-                }
-            }
+            fs::write(".it.toml", comment).unwrap();
+            // TODO: better error handling
+            let cfg = Config::builder()
+                .add_source(config::File::with_name(".it.toml"))
+                .build()
+                .unwrap();
+            println!("Config file created!");
+            return cfg;
+        }
+    }
 }
 
 fn find_todos_wrapper(fun: fn(&String) -> ()) -> Vec<String> {
@@ -34,18 +37,18 @@ fn find_todos_wrapper(fun: fn(&String) -> ()) -> Vec<String> {
     let mut opt_todos = vec![];
     if let Some(to_ignore) = ignore_files(&cur_dir) {
         WalkDir::new(".")
-        .into_iter()
-        .filter_entry(|e| filter_files(&to_ignore, e.path()))
-        .filter_map(|v| v.ok())
-        .for_each(|x| {
-            let todos = find_todos(x);
-            if todos.len() > 0 {
-                for todo in todos {
-                    fun(&todo);
-                    opt_todos.push(todo);
+            .into_iter()
+            .filter_entry(|e| filter_files(&to_ignore, e.path()))
+            .filter_map(|v| v.ok())
+            .for_each(|x| {
+                let todos = find_todos(x);
+                if todos.len() > 0 {
+                    for todo in todos {
+                        fun(&todo);
+                        opt_todos.push(todo);
+                    }
                 }
-            }
-        })
+            })
     }
     return opt_todos;
 }
@@ -53,16 +56,21 @@ fn find_todos_wrapper(fun: fn(&String) -> ()) -> Vec<String> {
 pub async fn report_todos() {
     let client = reqwest::Client::new();
     let todos = find_todos_wrapper(|_| {});
-    match client
-        // TODO: Read from env by appending the project name
-        // to the URL etc.
-        .post("http://localhost:8080/report")
-        .json(&todos)
-        .send()
-        .await {
-            Ok(_) => println!("Todos reported!"),
+    // TODO: This needs to know the project
+    // so that we can send the todos to the correct project based on its id.
+    for todo in todos {
+        match client
+            // TODO: Read from env by appending the project name
+            // to the URL etc.
+            .post("http://localhost:8080/report")
+            .json(&todo)
+            .send()
+            .await
+        {
+            Ok(_) => println!("Todo {} reported!", todo),
             Err(e) => println!("Something went wrong: {}", e),
         }
+    }
 }
 
 pub fn print_todos() {
