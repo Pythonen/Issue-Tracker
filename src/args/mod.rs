@@ -17,7 +17,7 @@ enum SubCommand {
 }
 
 impl CliArgs {
-    pub fn parse_arguments(self) -> Result<(), String> {
+    pub async fn parse_arguments(self) -> Result<(), String> {
         if self.cmds == SubCommand::Init {
             // TODO: Check that the operation succeeds
             actions::init_new_project();
@@ -28,7 +28,7 @@ impl CliArgs {
             return Ok(());
         } else if self.cmds == SubCommand::Report {
             // TODO: Check that the operation succeeds !! IMPORTANT !!
-            actions::report_todos();
+            actions::report_todos().await;
             return Ok(());
         } else if self.cmds == SubCommand::Login {
             // TODO: Check that the operation succeeds !! IMPORTANT !!
@@ -43,32 +43,32 @@ impl CliArgs {
 mod tests {
 
     use super::{CliArgs, SubCommand};
-    #[test]
-    fn test_parse_arguments_with_init() {
+    #[tokio::test]
+    async fn test_parse_arguments_with_init() {
         let args = CliArgs {
             cmds: SubCommand::Init,
         };
-        let parsed = args.parse_arguments();
+        let parsed = args.parse_arguments().await;
         assert!(parsed.is_ok());
     }
 
-    #[test]
+    #[tokio::test]
     #[should_panic]
     // TODO: This should panic only for now as this command is not yet implemented
-    fn test_parse_arguments_with_report() {
+    async fn test_parse_arguments_with_report() {
         let args = CliArgs {
             cmds: SubCommand::Report,
         };
-        let parsed = args.parse_arguments();
+        let parsed = args.parse_arguments().await;
         assert!(parsed.is_err());
     }
 
-    #[test]
-    fn test_parse_arguments_with_print() {
+    #[tokio::test]
+    async fn test_parse_arguments_with_print() {
         let args = CliArgs {
             cmds: SubCommand::Print,
         };
-        let parsed = args.parse_arguments();
+        let parsed = args.parse_arguments().await;
         assert!(parsed.is_ok());
     }
 }

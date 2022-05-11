@@ -86,24 +86,24 @@ fn find_todos_wrapper(fun: fn(&String) -> ()) -> Vec<String> {
     return opt_todos;
 }
 
-pub fn report_todos() {
+pub async fn report_todos() {
     let client = reqwest::Client::new();
     let todos = find_todos_wrapper(|_| {});
     // TODO: This needs to know the project
     // so that we can send the todos to the correct project based on its id.
-    // for todo in todos {
-    //     match client
-    //         // TODO: Read from env by appending the project name
-    //         // to the URL etc.
-    //         .post("http://localhost:8080/report")
-    //         .json(&todo)
-    //         .send()
-    //         .await
-    // {
-    //     Ok(_) => println!("Todo {} reported!", todo),
-    //     Err(e) => println!("Something went wrong: {}", e),
-    // }
-    // }
+    for todo in todos {
+        match client
+            // TODO: Read from env by appending the project name
+            // to the URL etc.
+            .post("http://localhost:8080/report")
+            .json(&todo)
+            .send()
+            .await
+        {
+            Ok(_) => println!("Todo {} reported!", todo),
+            Err(e) => println!("Something went wrong: {}", e),
+        }
+    }
 }
 
 pub fn print_todos() {
