@@ -1,10 +1,14 @@
 use config::Config;
+use dialoguer::MultiSelect;
 use std::{collections::HashSet, env::current_dir, fs};
 use walkdir::{DirEntry, WalkDir};
 
-use crate::util::{filter_files, ignore_files};
+use crate::util::{self, filter_files, ignore_files};
 
 pub fn init_new_project() -> Config {
+    // TODO: Fix this stub.
+    // let items = vec!["Option 1", "Option 2"];
+    // let _: Vec<usize> = MultiSelect::new().items(&items).interact().unwrap();
     match Config::builder()
         .add_source(config::File::with_name(".it.toml"))
         .build()
@@ -25,6 +29,35 @@ pub fn init_new_project() -> Config {
                 .build()
                 .unwrap();
             println!("Config file created!");
+            return cfg;
+        }
+    }
+}
+
+pub fn login() -> Config {
+    // TODO: Should check if the config file already exists
+    let (username, password) = util::get_creds();
+    // TODO: login here i.e. get token etc. from the backend
+    let mut conf_dir = dirs::home_dir().unwrap();
+    conf_dir.push(".it.global.toml");
+    println!("{}", conf_dir.to_str().unwrap());
+    match Config::builder()
+        .add_source(config::File::with_name(".it.global.toml"))
+        .build()
+    {
+        Ok(cfg) => {
+            // TODO: Delete this print
+            println!("Config file found... using it from now on!");
+            return cfg;
+        }
+        Err(_) => {
+            let comment = util::create_toml_stub(&username, &password);
+            fs::write(&conf_dir, comment).unwrap();
+            // TODO: better error handling
+            let cfg = Config::builder()
+                .add_source(config::File::with_name(&conf_dir.to_str().unwrap()))
+                .build()
+                .unwrap();
             return cfg;
         }
     }
