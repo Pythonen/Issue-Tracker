@@ -3,7 +3,7 @@ use dialoguer::MultiSelect;
 use std::{collections::HashSet, env::current_dir, fs};
 use walkdir::{DirEntry, WalkDir};
 
-use crate::util::{filter_files, ignore_files};
+use crate::util::{self, filter_files, ignore_files};
 
 pub fn init_new_project() -> Config {
     // TODO: Fix this stub.
@@ -34,6 +34,35 @@ pub fn init_new_project() -> Config {
     }
 }
 
+pub fn login() -> Config {
+    // TODO: Should check if the config file already exists
+    let (username, password) = util::get_creds();
+    // TODO: login here i.e. get token etc. from the backend
+    let mut conf_dir = dirs::home_dir().unwrap();
+    conf_dir.push(".it.global.toml");
+    println!("{}", conf_dir.to_str().unwrap());
+    match Config::builder()
+        .add_source(config::File::with_name(".it.global.toml"))
+        .build()
+    {
+        Ok(cfg) => {
+            // TODO: Delete this print
+            println!("Config file found... using it from now on!");
+            return cfg;
+        }
+        Err(_) => {
+            let comment = util::create_toml_stub(&username, &password);
+            fs::write(&conf_dir, comment).unwrap();
+            // TODO: better error handling
+            let cfg = Config::builder()
+                .add_source(config::File::with_name(&conf_dir.to_str().unwrap()))
+                .build()
+                .unwrap();
+            return cfg;
+        }
+    }
+}
+
 fn find_todos_wrapper(fun: fn(&String) -> ()) -> Vec<String> {
     // TODO: Could be refactored to be a bit more efficient
     // as it now returns the todos everytime
@@ -57,24 +86,24 @@ fn find_todos_wrapper(fun: fn(&String) -> ()) -> Vec<String> {
     return opt_todos;
 }
 
-pub async fn report_todos() {
+pub fn report_todos() {
     let client = reqwest::Client::new();
     let todos = find_todos_wrapper(|_| {});
     // TODO: This needs to know the project
     // so that we can send the todos to the correct project based on its id.
-    for todo in todos {
-        match client
-            // TODO: Read from env by appending the project name
-            // to the URL etc.
-            .post("http://localhost:8080/report")
-            .json(&todo)
-            .send()
-            .await
-        {
-            Ok(_) => println!("Todo {} reported!", todo),
-            Err(e) => println!("Something went wrong: {}", e),
-        }
-    }
+    // for todo in todos {
+    //     match client
+    //         // TODO: Read from env by appending the project name
+    //         // to the URL etc.
+    //         .post("http://localhost:8080/report")
+    //         .json(&todo)
+    //         .send()
+    //         .await
+    // {
+    //     Ok(_) => println!("Todo {} reported!", todo),
+    //     Err(e) => println!("Something went wrong: {}", e),
+    // }
+    // }
 }
 
 pub fn print_todos() {
