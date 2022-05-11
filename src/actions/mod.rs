@@ -1,10 +1,14 @@
 use config::Config;
+use dialoguer::MultiSelect;
 use std::{collections::HashSet, env::current_dir, fs};
 use walkdir::{DirEntry, WalkDir};
 
 use crate::util::{filter_files, ignore_files};
 
 pub fn init_new_project() -> Config {
+    // TODO: Fix this stub.
+    let items = vec!["Option 1", "Option 2"];
+    let _: Vec<usize> = MultiSelect::new().items(&items).interact().unwrap();
     match Config::builder()
         .add_source(config::File::with_name(".it.toml"))
         .build()
