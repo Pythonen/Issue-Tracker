@@ -10,7 +10,6 @@ pub fn init_new_project() -> Config {
         .build()
     {
         Ok(cfg) => {
-            println!("Config file found... using it from now on!");
             return cfg;
         }
         Err(_) => {
