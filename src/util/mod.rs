@@ -1,11 +1,34 @@
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use config::Config;
-
+use dialoguer::{Input, Password};
 
 pub fn filter_files(ignore: &Vec<String>, path: &Path) -> bool {
     let path_str = path.to_str().unwrap().to_string();
     !ignore.iter().any(|x| path_str.contains(x))
+}
+
+pub fn create_toml_stub(username: &str, password: &str) -> String {
+    return format!(
+        "# This is your global config file for *it* (issue tracker).\n\
+                            # You can add your own custom settings here in TOML format.\n\
+                            [account]\n\
+                            username = \"{}\"\n\
+                            password = \"{}\"",
+        username, password
+    );
+}
+
+pub fn get_creds() -> (String, String) {
+    let username = Input::<String>::new()
+        .with_prompt("Enter your username")
+        .interact_text()
+        .unwrap();
+    let password = Password::new()
+        .with_prompt("Enter your password")
+        .interact()
+        .unwrap();
+    return (username, password);
 }
 
 pub fn ignore_files(cur_dir: &PathBuf) -> Option<Vec<String>> {
@@ -33,6 +56,9 @@ pub fn ignore_files(cur_dir: &PathBuf) -> Option<Vec<String>> {
     return None;
 }
 
-pub fn get_config_file() -> Config { 
-    return Config::builder().add_source(config::File::with_name(".it.toml")).build().unwrap();
+pub fn get_config_file() -> Config {
+    return Config::builder()
+        .add_source(config::File::with_name(".it.toml"))
+        .build()
+        .unwrap();
 }
